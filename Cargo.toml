@@ -1,0 +1,7 @@
+[package]
+name = "rort"
+version = "0.1.0"
+authors = ["Dan Lucraft <dan@lucraft.me>"]
+edition = "2018"
+
+[dependencies]
