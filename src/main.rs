@@ -43,8 +43,16 @@ fn lines_from_file(filename: &str) -> Vec<String> {
             return contents.lines().map(|x| x.to_owned()).collect()
         }
         Err(error) => {
-            println!("error: {}", error);
-            ::std::process::exit(1);
+            match error.kind() {
+                std::io::ErrorKind::NotFound => {
+                    println!("file not found: {}", filename);
+                    ::std::process::exit(1);
+                }
+                _ => {
+                    println!("error: {}", error);
+                    ::std::process::exit(1);
+                }
+            }
         }
     }
     
