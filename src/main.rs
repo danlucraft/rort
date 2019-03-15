@@ -15,6 +15,10 @@ fn main() {
     }
     lines.sort();
     for line in lines {
-        print!("{}", line);
+        if line.ends_with("\n") {
+            print!("{}", line);
+        } else {
+            println!("{}", line);
+        }
     }
 }
