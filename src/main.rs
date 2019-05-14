@@ -1,16 +1,17 @@
-use std::io;
+use std::io::{self, Read};
 use std::env;
 use std::fs;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
-    let mut lines: Vec<String>;
+    let data: String;
     if args.len() > 1 {
         let filename = &(args[1]);
-        lines = lines_from_file(filename);
+        data = read_from_file(filename);
     } else {
-        lines = lines_from_stdin();
+        data = read_from_stdin();
     }
+    let mut lines: Vec<&str> = data.lines().collect();
     lines.sort();
     for line in lines {
         if line.ends_with("\n") {
@@ -21,39 +22,14 @@ fn main() {
     }
 }
 
-fn lines_from_stdin() -> Vec<String> {
-    let mut lines: Vec<String> = vec![];
-    loop {
-        let mut line: String = String::new();
-        match io::stdin().read_line(&mut line) {
-            Ok(0) => break,
-            Ok(_) => lines.push(line),
-            Err(error) => {
-                println!("error: {}", error);
-                ::std::process::exit(1);
-            }
-        }
-    }
-    lines
+fn read_from_stdin() -> String {
+    let mut buffer = String::new();
+    let stdin = io::stdin();
+    let mut handle = stdin.lock();
+    handle.read_to_string(&mut buffer).expect("couldn't read from stdin");
+    buffer
 }
 
-fn lines_from_file(filename: &str) -> Vec<String> {
-    match fs::read_to_string(filename) {
-        Ok(contents) => {
-            return contents.lines().map(|x| x.to_owned()).collect()
-        }
-        Err(error) => {
-            match error.kind() {
-                std::io::ErrorKind::NotFound => {
-                    println!("file not found: {}", filename);
-                    ::std::process::exit(1);
-                }
-                _ => {
-                    println!("error: {}", error);
-                    ::std::process::exit(1);
-                }
-            }
-        }
-    }
-    
+fn read_from_file(filename: &str) -> String {
+    fs::read_to_string(filename).expect("couldn't read from file")
 }
