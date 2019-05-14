@@ -5,3 +5,4 @@ authors = ["Dan Lucraft <dan@lucraft.me>"]
 edition = "2018"
 
 [dependencies]
+structopt = { version = "0.2" }

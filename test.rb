@@ -1,14 +1,12 @@
-def test(file)
-  `cat #{file} | sort                > tmp/test.sort`
-
-  `cat #{file} | ./target/debug/rort > tmp/test.rort`
-  `./target/debug/rort #{file} > tmp/test.rort.2`
+def test(stdin: nil, files: [])
+  `#{"cat #{stdin} | " if stdin}sort #{files.join(" ")}> tmp/test.sort`
+  `#{"cat #{stdin} | " if stdin}./target/debug/rort #{files.join(" ")}> tmp/test.rort`
   results = %x(diff tmp/test.rort tmp/test.sort).split("\n")
-  results2 = %x(diff tmp/test.rort.2 tmp/test.sort).split("\n")
-  p results + results2
+  p results
 end
 
-test("Cargo.toml")
-test("Cargo.lock")
-test(".gitignore")
-test("src/main.rs")
+test(stdin: "Cargo.toml")
+test(stdin: "Cargo.lock")
+test(stdin: ".gitignore")
+test(stdin: "src/main.rs")
+test(files: ["src/main.rs"])
