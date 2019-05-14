@@ -20,7 +20,7 @@ fn main() {
         return;
     }
     let data = fetch_data(&opt);
-    let mut lines: Vec<&str> = data.lines().collect();
+    let mut lines: Vec<&str> = data.iter().flat_map::<Vec<&str>, _>(|s| s.lines().collect()).collect();
     lines.sort();
     for line in lines {
         if line.ends_with("\n") {
@@ -31,21 +31,26 @@ fn main() {
     }
 }
 
-fn fetch_data(opt: &Opt) -> String {
+fn fetch_data(opt: &Opt) -> Vec<String> {
     if opt.files.len() > 0 {
-        let filename = &(opt.files[0]);
-        read_from_file(filename)
+        let mut result = Vec::new();
+        for filename in &opt.files {
+            result.push(read_from_file(filename));
+        }
+        result
     } else {
         read_from_stdin()
     }
 }
 
-fn read_from_stdin() -> String {
+fn read_from_stdin() -> Vec<String> {
     let mut buffer = String::new();
     let stdin = io::stdin();
     let mut handle = stdin.lock();
     handle.read_to_string(&mut buffer).expect("couldn't read from stdin");
-    buffer
+    let mut result = Vec::new();
+    result.push(buffer);
+    result
 }
 
 fn read_from_file(filename: &PathBuf) -> String {
